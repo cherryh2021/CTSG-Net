@@ -1,0 +1,2 @@
+total run time,inference time,#model parameter
+22.75999689102173,0.009414144924708776,1219833
