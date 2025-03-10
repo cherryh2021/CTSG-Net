@@ -19,4 +19,4 @@ We regret that, due to data privacy restrictions, we cannot provide the Yizhuang
 `python3 data_generator.py --add_past_cycle=False --add_signal_index=False`
 
 ## Model Training
-`python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361 --epoch=5`
+`python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361 --epoch=30`
