@@ -16,7 +16,7 @@ Our code is based on Python3 (>= 3.6). There are a few dependencies to run the c
 ## Dataset
 We regret that, due to data privacy restrictions, we cannot provide the Yizhuang dataset. Instead, we offer a sample dataset generated from a SUMO simulation, available at https://github.com/cherryh2021/Lane-level-queue-length-data-in-SUMO-simulation.git
 ## Data Preparation
-`python3 data_generator.py --add_past_cycle=False --add_signal_index=False`
+`python3 data_generator.py`
 
 ## Model Training
 `python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361 --epoch=30`
