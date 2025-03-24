@@ -150,4 +150,5 @@ usage: main.py [-h] [--load_path LOAD_PATH] [--gso_type GSO_TYPE] [--graph_conv_
 ```
 
 To get started, use the following command to train the CTSG-Net model for 30 epochs on a GPU with the provided dataset:
+
 `python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361 --epoch=30`
