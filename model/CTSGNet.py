@@ -958,7 +958,8 @@ class gtnet_Signal2(nn.Module):
                 new_dilation *= dilation_exponential
         self.skipE = nn.Conv2d(in_channels=conv_channels, out_channels=skip_channels, kernel_size=(1, 1))
         self.layers = layers
-        self.end_conv_1 = nn.Conv2d(in_channels=skip_channels, out_channels=out_dim, kernel_size=(1,1), bias=True)
+        self.end_conv_1 = nn.Conv2d(in_channels=skip_channels, out_channels=end_channels, kernel_size=(1,1), bias=True)
+        self.end_conv_2 = nn.Conv2d(in_channels=end_channels, out_channels=out_dim, kernel_size=(1,1), bias=True)
 
 
         self.idx = torch.arange(self.num_nodes).to(device)
@@ -1050,5 +1051,6 @@ class gtnet_Signal2(nn.Module):
         skip += self.skipE(x)
         skip = self.mlp2(skip)
         x = F.relu(self.end_conv_1(skip))
+        x = self.end_conv_2(x)
         x = x.transpose(2, 3)
         return x
