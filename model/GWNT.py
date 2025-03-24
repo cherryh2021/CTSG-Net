@@ -152,8 +152,7 @@ class gwnet(nn.Module):
 
 
     def forward(self, input):
-        input = input.transpose(2, 3)  #[32, 1, 458, 20]
-        # print(input.shape)
+        input = input.transpose(2, 3)
         in_len = input.size(3)
         if in_len<self.receptive_field:
             x = nn.functional.pad(input,(self.receptive_field-in_len,0,0,0))
@@ -214,9 +213,7 @@ class gwnet(nn.Module):
 
 
             x = self.bn[i](x)
-        #print("5. x.shape", x.shape)
         x = F.relu(self.mlp2(skip))
-        #print("6. x.shape", x.shape)
         x = F.relu(self.end_conv_1(x))
         x = self.end_conv_2(x)
         x = x.transpose(2, 3)

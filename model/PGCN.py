@@ -32,31 +32,23 @@ class gcn(nn.Module):
     def __init__(self, c_in, c_out, dropout, support_len=3, order=2):
         super(gcn, self).__init__()
         self.nconv = nconv()
-        #print("order, support_len", order, support_len)
         c_in = (order * support_len + 1) * c_in
-        #print("mlp c_in, c_out", c_in, c_out)
         self.mlp = linear(c_in, c_out)
         self.dropout = dropout
         self.order = order
 
     def forward(self, x, support):
-        #print("x in mlp shape", x.shape)  # [32, 32, 310, 19]
         out = [x]
-        #print("len(support)", len(support))
-        #print("self.order", self.order)
-        for a in support:  # 32
+        for a in support:
             x1 = self.nconv(x, a, a.dim())
-            #print("x1.shape", x1.shape)
             out.append(x1)
 
             for k in range(2, self.order + 1):
                 x2 = self.nconv(x1, a, a.dim())
-                #print("x2.shape", x2.shape)
                 out.append(x2)
                 x1 = x2
 
         h = torch.cat(out, dim=1)
-        #print("input mlp h.shape", h.shape)  # [32, 2080, 310, 19]
         h = self.mlp(h)
         h = F.dropout(h, self.dropout, training=self.training)
         return h
@@ -140,7 +132,7 @@ class gwnet(nn.Module):
 
     def forward(self, input):
         input = input.transpose(2, 3)
-        in_len = input.size(3)  # [64, 3, 361, 20]
+        in_len = input.size(3)
         if in_len < self.receptive_field:
             x = nn.functional.pad(input, (self.receptive_field - in_len, 0, 0, 0))
         else:
@@ -159,10 +151,7 @@ class gwnet(nn.Module):
             adp = torch.einsum('nvt, tc->nvc', (xn, self.adpvec))
             adp = torch.bmm(adp, xn.permute(0, 2, 1))
             adp = F.softmax(F.relu(adp), dim=1)
-            #print("self.supports.shape", self.supports.shape)  # [310, 310]
-            #print("adp.shape", adp.shape)  # [32, 310, 310]
             new_supports = self.supports + adp
-        #print("new_supports.shape", new_supports.shape)
         # WaveNet layers
         for i in range(self.blocks * self.layers):
             # print(torch.cuda.memory_allocated(device='cuda:0'))
@@ -196,7 +185,6 @@ class gwnet(nn.Module):
             except:
                 skip = 0
             skip = s + skip
-            #print("gcn input.shape", x.shape)  # [32, 32, 310, 19]
             if self.gcn_bool and self.supports is not None:
                 if self.addaptadj:
                     x = self.gconv[i](x, new_supports)

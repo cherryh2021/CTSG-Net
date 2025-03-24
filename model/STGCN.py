@@ -109,7 +109,6 @@ class TemporalConvLayer(nn.Module):
                 x = torch.mul((x_p + x_in), torch.sigmoid(x_q))
 
             else:
-                # tanh(x_p + x_in) ⊙ sigmoid(x_q)
                 x = torch.mul(torch.tanh(x_p + x_in), torch.sigmoid(x_q))
 
         elif self.act_func == 'relu':
@@ -146,7 +145,6 @@ class ChebGraphConv(nn.Module):
             init.uniform_(self.bias, -bound, bound)
     
     def forward(self, x):
-        #bs, c_in, ts, n_vertex = x.shape
         x = torch.permute(x, (0, 2, 3, 1))
 
         if self.Ks - 1 < 0:
@@ -198,7 +196,6 @@ class GraphConv(nn.Module):
             init.uniform_(self.bias, -bound, bound)
 
     def forward(self, x):
-        #bs, c_in, ts, n_vertex = x.shape
         x = torch.permute(x, (0, 2, 3, 1))
 
         first_mul = torch.einsum('hi,btij->bthj', self.gso, x)
@@ -283,7 +280,7 @@ class OutputBlock(nn.Module):
         self.dropout = nn.Dropout(p=droprate)
 
     def forward(self, x):
-        x = self.tmp_conv1(x)  # x: [64, 1, 12, 361]
+        x = self.tmp_conv1(x)
         x = self.tc1_ln(x.permute(0, 2, 3, 1))
         x = self.fc1(x)
         x = self.relu(x)
@@ -334,18 +331,13 @@ class STGCNChebGraphConv(nn.Module):
             self.dropout = nn.Dropout(p=args.droprate)
 
     def forward(self, x):
-        # print("x.shape", x.shape) # [64, 1, 12, 361]
         x = self.st_blocks(x)
-        # print("0. x.shape", x.shape) # [64, 64, 4, 361]
         if self.Ko > 1:
             x = self.output(x)
-            # print("1.1, x.shape", x.shape)  # [64, 12, 1, 361]
         elif self.Ko == 0:
             x = self.fc1(x.permute(0, 2, 3, 1))
-            # print("1.2, x.shape", x.shape)
             x = self.relu(x)
             x = self.fc2(x)
-            # print("1.3, x.shape", x.shape)
             x = x.permute(0, 3, 1, 2)
         return x
 
@@ -392,17 +384,12 @@ class STGCNGraphConv(nn.Module):
             self.do = nn.Dropout(p=args.droprate)
 
     def forward(self, x):
-        #print("x.shape", x.shape) # [64, 1, 12, 361]
         x = self.st_blocks(x)
-        #print("0. x.shape", x.shape) # [64, 64, 4, 361]
         if self.Ko > 1:
             x = self.output(x)
-            #print("1.1, x.shape", x.shape)  # [64, 12, 1, 361]
         elif self.Ko == 0:
             x = self.fc1(x.permute(0, 2, 3, 1))
-            #print("1.2, x.shape", x.shape)
             x = self.relu(x)
             x = self.fc2(x)
-            #print("1.3, x.shape", x.shape)
             x = x.permute(0, 3, 1, 2)
         return x

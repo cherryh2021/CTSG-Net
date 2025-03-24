@@ -119,7 +119,7 @@ class DCGRUCell(torch.nn.Module):
         # this is to ensure row-major ordering to equal torch.sparse.sparse_reorder(L)
         indices = indices[np.lexsort((indices[:, 0], indices[:, 1]))]
         L = torch.sparse_coo_tensor(indices.T, L.data, L.shape, device=self.device)
-        return L.to(torch.float)  # 确保将张量转换为 Float 类型
+        return L.to(torch.float)
 
     def forward(self, inputs, hx):
         """Gated recurrent unit (GRU) with Graph Convolution.

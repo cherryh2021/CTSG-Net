@@ -90,8 +90,6 @@ class dy_mixprop(nn.Module):
 
 
     def forward(self,x):
-        #adj = adj + torch.eye(adj.size(0)).to(x.device)
-        #d = adj.sum(1)
         x1 = torch.tanh(self.lin1(x))
         x2 = torch.tanh(self.lin2(x))
         adj = self.nconv(x1.transpose(2,1),x2)
