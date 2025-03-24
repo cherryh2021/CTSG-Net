@@ -59,7 +59,13 @@ $ conda create -n venv python=3.9 -y
 $ conda activate venv
 (venv) $
 ```
-### Data Preparation
+
+#### Install dependencies
+
+```shell
+(venv) $ pip install -r requirements.txt
+```
+#### Data Preparation
 
 You can use the `data_generator.py` to generate input data for training and testing process. You can find the detail usage by:
 
@@ -82,14 +88,6 @@ usage: data_generator.py [-h] [--dataset DATASET] [--seq_length_x SEQ_LENGTH_X] 
 │ --help                  Show this message and exit                           │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ```
-#### Install dependencies
 
-```shell
-(venv) $ pip install -r requirements.txt
-```
-
-## Data Preparation
-`python3 data_generator.py`
-
-## Model Training
+### Model Training
 `python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361 --epoch=30`
