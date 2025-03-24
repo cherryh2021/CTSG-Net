@@ -90,4 +90,64 @@ usage: data_generator.py [-h] [--dataset DATASET] [--seq_length_x SEQ_LENGTH_X] 
 ```
 
 ### Model Training
+```shell
+(venv) $ python main.py --help
+                                                                                
+usage: main.py [-h] [--load_path LOAD_PATH] [--gso_type GSO_TYPE] [--graph_conv_type {cheb_graph_conv,graph_conv}]
+               [--enable_cuda ENABLE_CUDA] [--n_vertex N_VERTEX] [--checkpoint_epoch CHECKPOINT_EPOCH] [--device DEVICE]
+               [--cl CL] [--seq_in_len SEQ_IN_LEN] [--seq_out_len SEQ_OUT_LEN] [--batch_size BATCH_SIZE]
+               [--learning_rate LEARNING_RATE] [--weight_decay WEIGHT_DECAY] [--epochs EPOCHS] [--seed SEED]
+               [--clip CLIP] [--model {CTSGNet,STGCN,GWNT,LSTM,DCRNN,MTGNN,PGCN}] [--opt OPT] [--gamma GAMMA]
+               [--step_size STEP_SIZE] [--weighted_lf WEIGHTED_LF] [--n_his N_HIS] [--n_pred N_PRED]
+               [--time_intvl TIME_INTVL] [--Kt KT] [--stblock_num STBLOCK_NUM] [--act_func {glu,gtu}]
+               [--Ks {3,2}] [--enable_bias ENABLE_BIAS] [--droprate DROPRATE] [--enable_signal ENABLE_SIGNAL]
+               [--adap_only ADAP_ONLY] [--dynamic_bool DYNAMIC_BOOL] [--buildA_true BUILDA_TRUE] [--gcn_true GCN_TRUE]
+               [--gcn_type {gated_attention,gated,attention,mix-hop}] [--target_hor TARGET_HOR] [--save SAVE]
+               [--print_every PRINT_EVERY]
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────╮
+│ -h, --help                  Show this help message and exit                                  │
+│ --load_path                 Path to the checkpoint model                                     │
+│ --gso_type                  Graph  operator type                                             │
+│ --graph_conv_type           Graph convolution type (cheb_graph_conv or graph_conv)           │
+│ --enable_cuda               Enable CUDA (default: True)                                      │
+│ --n_vertex                  Number of vertices in the graph                                  │
+│ --checkpoint_epoch          Starting epoch for the checkpoint                                │
+│ --device                    Device for computation (e.g., cpu, cuda)                         │
+│ --cl                        Enable curriculum learning                                       │
+│ --seq_in_len                Input sequence length                                            │
+│ --seq_out_len               Output sequence length                                           │
+│ --batch_size                Batch size for training                                          │
+│ --learning_rate             Initial learning rate                                            │
+│ --weight_decay              Weight decay rate (L2 regularization)                            │
+│ --epochs                    Number of training epochs                                        │
+│ --seed                      Random seed for reproducibility                                  │
+│ --clip                      Gradient clipping value                                          │
+│ --model                     Model type (CTSGNet, STGCN, GWNT, LSTM, DCRNN, MTGNN, PGCN)      │
+│ --opt                       Optimizer type (e.g., adam, sgd)                                 │
+│ --gamma                     Learning rate decay factor                                       │
+│ --step_size                 Steps before learning rate decay                                 │
+│ --weighted_lf               Enable weighted loss function                                    │        
+│ --n_his                     Number of historical time steps                                  │
+│ --n_pred                    Number of prediction time steps                                  │
+│ --time_intvl                Time interval between steps                                      │
+│ --Kt                        Temporal convolution kernel size                                 │
+│ --stblock_num               Number of spatio-temporal blocks                                 │
+│ --act_func                  Activation function (glu or gtu)                                 │
+│ --Ks                        Spatial kernel size (3 or 2)                                     │
+│ --enable_bias               Enable bias in layers                                            │
+│ --droprate                  Dropout rate                                                     │
+│ --enable_signal             Enable signal processing                                         │
+│ --adap_only                 Use only the adaptive adjacency matrix                           │
+│ --dynamic_bool              Add a dynamic adjacency matrix                                   │        
+│ --buildA_true               Construct an adaptive adjacency matrix                           │
+│ --gcn_true                  Enable graph convolution                                         │
+│ --gcn_type                  GCN type (gated_attention, gated, attention, mix-hop)            │
+│ --target_hor                Target prediction horizon                                        │
+│ --save                      Path to save model outputs                                       │
+│ --print_every               Frequency of printing training progress                          │
+╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+To get started, use the following command to train the CTSG-Net model for 30 epochs on a GPU with the provided dataset:
 `python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361 --epoch=30`
