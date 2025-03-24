@@ -8,13 +8,27 @@ This project introduces CTSG-Net, a novel model designed for fine-grained, netwo
 ## Overall framework
 <img width="790" alt="overall framework" src="https://github.com/user-attachments/assets/9810013a-d44b-43e6-b48f-989867655d3a" />
 
-## Requirements
-Our code is based on Python3 (>= 3.6). There are a few dependencies to run the code. The major libraries are listed as follows:
+## Pre-requisites
+### Python
+
+This project is created with Python 3.9.18. Virtual environment is highly recommended. It can help you avoid
+most dependency issue and reproducible problems.
+
+You can use [Anaconda](https://docs.anaconda.com/anaconda/install/index.html)
+or [Miniconda](https://docs.conda.io/en/latest/miniconda.html), or you can use python
+standard library [venv](https://docs.python.org/3.8/library/venv.html).
+
+Anaconda/Miniconda will be used in the following documentation.
+### Pytorch
+This project uses PyTorch 2.1.1. You can install it by following the instructions on the official website [Pytorch](https://pytorch.org). Refer to their documentation for version-specific installation details.
+### Requirements
+Our code is based on Python3 (>= 3.6). There are a few other dependencies to run the code. The major libraries are listed as follows:
 
 - torch==2.1.1
 - pandas==2.0.2
 - numpy==1.26.2
-- matplotlib==3.8.2
+
+To install these dependencies, run the following command:   `pip install requirements.txt`.
 
 ## Dataset
 We regret that, due to data privacy restrictions, we cannot provide the Yizhuang dataset. Instead, we offer a sample dataset generated from a SUMO simulation, available at https://github.com/cherryh2021/Lane-level-queue-length-data-in-SUMO-simulation.git
