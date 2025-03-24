@@ -28,10 +28,66 @@ Our code is based on Python3 (>= 3.6). There are a few other dependencies to run
 - pandas==2.0.2
 - numpy==1.26.2
 
-To install these dependencies, run the following command:   `pip install requirements.txt`.
-
 ## Dataset
-We regret that, due to data privacy restrictions, we cannot provide the Yizhuang dataset. Instead, we offer a sample dataset generated from a SUMO simulation, available at https://github.com/cherryh2021/Lane-level-queue-length-data-in-SUMO-simulation.git
+Due to data privacy restrictions, we are unable to share the Yizhuang dataset. Instead, we provide a sample dataset generated from a SUMO simulation to demonstrate the model's input data format. You can access it here: [Lane-level Queue Length Dataset Generated from SUMO Simulation](https://github.com/cherryh2021/Lane-level-queue-length-data-in-SUMO-simulation.git)
+
+## Usage
+
+### Get the source code and input data
+
+After uncompress the source code and data, you will have the following directory structure:
+
+```plain
+.
+├── data                   # Input data for the project.
+├── model                  # Code for CTSG-Net and baseline models.
+├── README.md
+├── data_generator         # Scripts to transform input data into training and testing.
+├── main.py                # Main executable script.
+├── requirements.txt       # List of Python dependencies
+└── utils.py               # Utility functions.
+```
+
+### Preparation
+
+#### Create and start the virtual environment
+
+First start the virtual environment:
+
+```shell
+$ conda create -n venv python=3.9 -y
+$ conda activate venv
+(venv) $
+```
+### Data Preparation
+
+You can use the `data_generator.py` to generate input data for training and testing process. You can find the detail usage by:
+
+```shell
+(venv) $ python data_generator.py --help
+                                                                                
+usage: data_generator.py [-h] [--dataset DATASET] [--seq_length_x SEQ_LENGTH_X] [--seq_length_y SEQ_LENGTH_Y] [--y_start Y_START] [--dow]
+                         [--signal_length SIGNAL_LENGTH] [--cycle_num CYCLE_NUM] [--add_past_cycle ADD_PAST_CYCLE] [--add_signal_index ADD_SIGNAL_INDEX]
+
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --dataset               Path to the input dataset                            │
+│ --seq_length_x          Length of the input sequence for prediction          │
+│ --seq_length_y          Length of the output prediction sequence             │
+│ --y_start               Starting index for the prediction                    │
+│ --dow                   Day of the week                                      │
+│ --signal_length         Path to store the signal file                        │
+│ --cycle_num             Number of past cycles to include at the same position│
+│ --add_past_cycle        Whether to include input from past cycle positions   │
+│ --add_signal_index      Whether to include the cycle position index          │
+│ --help                  Show this message and exit                           │
+╰──────────────────────────────────────────────────────────────────────────────╯
+```
+#### Install dependencies
+
+```shell
+(venv) $ pip install -r requirements.txt
+```
+
 ## Data Preparation
 `python3 data_generator.py`
 
