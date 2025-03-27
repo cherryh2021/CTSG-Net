@@ -93,17 +93,6 @@ def get_parameters():
 
     # CTSG-Net settings
     parser.add_argument("--enable_signal", type=str_to_bool, default=True, help="Enable signal processing")
-    parser.add_argument("--adap_only", type=str_to_bool, default=False, help="Use only adaptive matrix")
-    parser.add_argument("--dynamic_bool", type=str_to_bool, default=True, help="Add dynamic matrix")
-    parser.add_argument("--buildA_true", type=str_to_bool, default=True, help="Construct adaptive adjacency matrix")
-    parser.add_argument("--gcn_true", type=str_to_bool, default=True, help="Use graph convolution")
-    parser.add_argument(
-        "--gcn_type",
-        type=str,
-        default="gated_attention",
-        choices=["gated_attention", "gated", "attention", "mix-hop"],
-        help="GCN type",
-    )
 
     # Result logging
     parser.add_argument("--target_hor", type=int, default=0, help="Target prediction horizon")
@@ -170,40 +159,20 @@ def prepare_model(args, device, tanhalpha, hop, gamma):
     elif args.model == "CTSGNet":
         common_params = {
             "seq_in": args.seq_in_len,
-            "gcn_true": args.gcn_true,
-            "buildA_true": args.buildA_true,
             "gcn_depth": hop,
             "num_nodes": args.n_vertex,
             "device": device,
             "cycle_num": 3,
             "predefined_A": args.gso,
             "dropout": args.droprate,
-            "subgraph_size": 20,
-            "node_dim": 40,
-            "dilation_exponential": 2,
-            "conv_channels": 32,
-            "residual_channels": 32,
-            "skip_channels": 32,
-            "end_channels": 128,
             "seq_length": args.seq_in_len,
-            "in_dim": 1,
             "out_dim": args.seq_out_len,
-            "layers": 2,
             "tanhalpha": tanhalpha,
-            "layer_norm_affline": True,
-            "dynamic_bool": args.dynamic_bool,
-            "adap_only": args.adap_only,
             "gamma": gamma,
         }
-        if not any([args.dynamic_bool, args.buildA_true, args.gcn_true]):
-            print("Ablation study: No dynamic, adaptive, or GCN components")
-            model = CTSGNet.gtnet_Signal2(mlp_indim=args.seq_in_len + 4, **common_params)
-        elif args.enable_signal:
-            print("Complete CTSGNet Model")
-            model = CTSGNet.gtnet_Signal(gcn_type=args.gcn_type, mlp_indim=args.seq_in_len + 4, **common_params)
-        else:
-            print("Ablation study: No signal processing")
-            model = CTSGNet.gtnet(mlp_indim=args.seq_in_len, **common_params)
+
+        print("CTSGNet Model")
+        model = CTSGNet.gtnet_Signal(mlp_indim=args.seq_in_len + 4, **common_params)
 
     elif args.model == "LSTM":
         model = LSTM.VertexLSTM(1, 5, args.seq_out_len, 1, args.droprate)
