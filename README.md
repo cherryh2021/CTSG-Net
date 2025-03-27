@@ -144,11 +144,11 @@ To get started, use the following command to train the CTSG-Net model for 30 epo
 `python3 main.py --epochs=30 --checkpoint_epoch=0 --device='cuda:0' --load_path='' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet'  --n_vertex=361`
 
 ### Model Testing
-Trained models are saved by default in the garage/ directory. To evaluate the performance of a trained model (e.g., _epoch_CTSGNet_0.pth), run the following command:
+Trained models are saved by default in the garage/ directory. To evaluate the performance of a trained model (e.g., '_epoch_CTSGNet_0.pth'), run the following command:
 
 `python3 main.py --epochs=0 --checkpoint_epoch=1 --device='cuda:0' --load_path='_epoch_CTSGNet_0.pth' --seq_in_len=20 --seq_out_len=6 --model='CTSGNet' --n_vertex=361`
 
 Parameters:
-- epochs=0: Skips training and proceeds directly to testing.
-- checkpoint_epoch=1: Specifies the starting epoch for loading the checkpoint (any value greater than 0 is acceptable in testing).
---load_path='_epoch_CTSGNet_0.pth': Path to the trained model file in the garage/ directory.
+- `epochs=0`: Skips training and proceeds directly to testing.
+- `checkpoint_epoch=1`: Specifies the starting epoch for loading the checkpoint (any value greater than 0 is acceptable in testing).
+- `load_path='_epoch_CTSGNet_0.pth'`: Path to the trained model file in the garage/ directory.
