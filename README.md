@@ -93,15 +93,16 @@ usage: data_generator.py [-h] [--dataset DATASET] [--seq_length_x SEQ_LENGTH_X] 
 ```shell
 (venv) $ python main.py --help
                                                                                 
-usage: main.py [-h] [--load_path LOAD_PATH] [--gso_type GSO_TYPE] [--graph_conv_type {cheb_graph_conv,graph_conv}] [--enable_cuda ENABLE_CUDA] [--n_vertex N_VERTEX]
-               [--checkpoint_epoch CHECKPOINT_EPOCH] [--device DEVICE] [--cl CL] [--seq_in_len SEQ_IN_LEN] [--seq_out_len SEQ_OUT_LEN] [--batch_size BATCH_SIZE]
-               [--learning_rate LEARNING_RATE] [--weight_decay WEIGHT_DECAY] [--epochs EPOCHS] [--seed SEED] [--clip CLIP]
-               [--model {CTSGNet,STGCN,GWNT,LSTM,DCRNN,MTGNN,PGCN}] [--opt OPT] [--gamma GAMMA] [--step_size STEP_SIZE] [--weighted_lf WEIGHTED_LF] [--n_his N_HIS]
-               [--n_pred N_PRED] [--time_intvl TIME_INTVL] [--Kt KT] [--stblock_num STBLOCK_NUM] [--act_func {glu,gtu}] [--Ks {3,2}] [--enable_bias ENABLE_BIAS]
-               [--droprate DROPRATE] [--enable_signal ENABLE_SIGNAL] [--target_hor TARGET_HOR] [--save SAVE] [--print_every PRINT_EVERY]
+usage: main.py [-h] [--dataset DATASET] [--adj_data ADJ_DATA] [--load_path LOAD_PATH] [--gso_type GSO_TYPE] [--graph_conv_type {cheb_graph_conv,graph_conv}]
+               [--enable_cuda ENABLE_CUDA] [--n_vertex N_VERTEX] [--checkpoint_epoch CHECKPOINT_EPOCH] [--device DEVICE] [--cl CL] [--seq_in_len SEQ_IN_LEN]
+               [--seq_out_len SEQ_OUT_LEN] [--batch_size BATCH_SIZE] [--learning_rate LEARNING_RATE] [--weight_decay WEIGHT_DECAY] [--epochs EPOCHS] [--seed SEED]
+               [--clip CLIP] [--model {CTSGNet}] [--opt OPT] [--gamma GAMMA] [--step_size STEP_SIZE] [--weighted_lf WEIGHTED_LF] [--droprate DROPRATE]
+               [--n_pred N_PRED] [--target_hor TARGET_HOR] [--save SAVE] [--print_every PRINT_EVERY]
 
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────╮
 │ -h, --help                  Show this help message and exit                                  │
+│ --dataset                   Path to input data                                               │
+│ --adj_data                  Path to adjacency matrix                                         │
 │ --load_path                 Path to the checkpoint model                                     │
 │ --gso_type                  Graph  operator type                                             │
 │ --graph_conv_type           Graph convolution type (cheb_graph_conv or graph_conv)           │
@@ -122,17 +123,9 @@ usage: main.py [-h] [--load_path LOAD_PATH] [--gso_type GSO_TYPE] [--graph_conv_
 │ --opt                       Optimizer type (e.g., adam, sgd)                                 │
 │ --gamma                     Learning rate decay factor                                       │
 │ --step_size                 Steps before learning rate decay                                 │
-│ --weighted_lf               Enable weighted loss function                                    │        
-│ --n_his                     Number of historical time steps                                  │
+│ --weighted_lf               Enable weighted loss function                                    │
+│ --droprate                  Dropout rate                                                     │       
 │ --n_pred                    Number of prediction time steps                                  │
-│ --time_intvl                Time interval between steps                                      │
-│ --Kt                        Temporal convolution kernel size                                 │
-│ --stblock_num               Number of spatio-temporal blocks                                 │
-│ --act_func                  Activation function (glu or gtu)                                 │
-│ --Ks                        Spatial kernel size (3 or 2)                                     │
-│ --enable_bias               Enable bias in layers                                            │
-│ --droprate                  Dropout rate                                                     │
-│ --enable_signal             Enable signal processing                                         │
 │ --target_hor                Target prediction horizon                                        │
 │ --save                      Path to save model outputs                                       │
 │ --print_every               Frequency of printing training progress                          │
