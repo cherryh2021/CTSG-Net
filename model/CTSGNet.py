@@ -1,6 +1,5 @@
 from __future__ import division
 import torch
-import numpy as np
 import torch.nn as nn
 from torch.nn import init
 import numbers
