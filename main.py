@@ -273,18 +273,6 @@ def train(args, optimizer, scheduler, model, dataloader, device, w0=1, c1=0, c2=
 
         scheduler.step()
 
-    # Save training history
-    with open(f"train_loss/output_{args.model}.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(train_loss_epoch)
-        writer.writerow(val_loss_epoch)
-        writer.writerow(train_mae_all_epoch)
-        writer.writerow(train_mae_non_epoch)
-        writer.writerow(train_mae_large_epoch)
-        writer.writerow(val_mae_all_epoch)
-        writer.writerow(val_mae_non_epoch)
-        writer.writerow(val_mae_large_epoch)
-
     # Determine best model
     best_id = np.argmin(his_val_nonzeroMAE) if his_val_nonzeroMAE else 0
     criterion = round(his_val_nonzeroMAE[best_id], 4) if his_val_nonzeroMAE else 1000
@@ -352,18 +340,12 @@ def test(args, model, device, path, dataloader):
 
     # Save results
     os.makedirs("output", exist_ok=True)
-    os.makedirs("output_horizon", exist_ok=True)
-
     with open(f"output/{args.model}.csv", "w", newline="") as f:
         writer = csv.writer(f)
         header = [f"{t}s{k.upper().replace('_', '')}" for k in metrics for t in [5, 10, 15]]
         writer.writerow(header)
         writer.writerow([results[k][i] for k in metrics for i in range(3)])
 
-    with open(f"output_horizon/{args.model}.csv", "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([f"{5 * (i + 1)}s" for i in range(args.seq_out_len)])
-        writer.writerow([np.mean(horizon_metrics["non_mae"]) for horizon in range(args.seq_out_len)])
 
     return (results["all_mae"][0], results["non_mae"][0], results["large_mae"][0]), avg_inference_time
 
