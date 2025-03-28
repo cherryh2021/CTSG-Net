@@ -1,19 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-
 import argparse
 import csv
 from datetime import datetime
 import os
 import time
-
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import torch
 import torch.optim as optim
-import tqdm
-
-from model import STGCN, CTSGNet, GWNT, LSTM, DCRNN, MTGNN, PGCN
+from model import CTSGNet
 import util
 
 
@@ -42,15 +36,11 @@ def get_parameters():
     parser = argparse.ArgumentParser(description="Traffic Prediction Model Training")
 
     # Input settings
+    parser.add_argument("--dataset", type=str, default="data/DATA", help="Path to data")
+    parser.add_argument("--adj_data", type=str, default="data/adjacency.pkl", help="Path to adjacency matrix")
     parser.add_argument("--load_path", type=str, default="", help="Path to checkpoint model")
     parser.add_argument("--gso_type", type=str, default="sym_norm_lap", help="Graph shift operator type")
-    parser.add_argument(
-        "--graph_conv_type",
-        type=str,
-        default="graph_conv",
-        choices=["cheb_graph_conv", "graph_conv"],
-        help="Graph convolution type",
-    )
+    parser.add_argument("--graph_conv_type", type=str, default="graph_conv", choices=["cheb_graph_conv", "graph_conv"], help="Graph convolution type")
     parser.add_argument("--enable_cuda", type=str_to_bool, default=True, help="Enable CUDA")
     parser.add_argument("--n_vertex", type=int, default=351, help="Number of vertices in graph")
 
@@ -58,7 +48,7 @@ def get_parameters():
     parser.add_argument("--checkpoint_epoch", type=int, default=0, help="Starting epoch for checkpoint")
 
     # Training settings
-    parser.add_argument("--device", type=str, default="cuda:0", help="Device for computation (e.g., 'cuda:0', 'cpu')")
+    parser.add_argument("--device", type=str, default="cuda:0", help="Device for computation")
     parser.add_argument("--cl", type=str_to_bool, default=False, help="Use curriculum learning")
     parser.add_argument("--seq_in_len", type=int, default=20, help="Input sequence length")
     parser.add_argument("--seq_out_len", type=int, default=6, help="Output sequence length")
@@ -68,31 +58,13 @@ def get_parameters():
     parser.add_argument("--epochs", type=int, default=100, help="Number of training epochs")
     parser.add_argument("--seed", type=int, default=101, help="Random seed for reproducibility")
     parser.add_argument("--clip", type=int, default=5, help="Gradient clipping value")
-    parser.add_argument(
-        "--model",
-        type=str,
-        default="CTSGNet",
-        choices=["CTSGNet", "STGCN", "GWNT", "LSTM", "DCRNN", "MTGNN", "PGCN"],
-        help="Model type",
-    )
+    parser.add_argument("--model", type=str, default="CTSGNet", choices=["CTSGNet"], help="Model type")
     parser.add_argument("--opt", type=str, default="adamw", help="Optimizer type (e.g., 'adam', 'adamw')")
     parser.add_argument("--gamma", type=float, default=0.1, help="Learning rate decay factor")
     parser.add_argument("--step_size", type=int, default=15, help="Steps before learning rate decay")
     parser.add_argument("--weighted_lf", type=str_to_bool, default=True, help="Use weighted loss function")
-
-    # STGCN settings
-    parser.add_argument("--n_his", type=int, default=12, help="Number of historical time steps")
-    parser.add_argument("--n_pred", type=int, default=6, help="Number of prediction time steps")
-    parser.add_argument("--time_intvl", type=int, default=5, help="Time interval in minutes")
-    parser.add_argument("--Kt", type=int, default=3, help="Temporal convolution kernel size")
-    parser.add_argument("--stblock_num", type=int, default=2, help="Number of spatio-temporal blocks")
-    parser.add_argument("--act_func", type=str, default="glu", choices=["glu", "gtu"], help="Activation function")
-    parser.add_argument("--Ks", type=int, default=3, choices=[3, 2], help="Spatial kernel size")
-    parser.add_argument("--enable_bias", type=str_to_bool, default=True, help="Enable bias in layers")
     parser.add_argument("--droprate", type=float, default=0.7, help="Dropout rate")
-
-    # CTSG-Net settings
-    parser.add_argument("--enable_signal", type=str_to_bool, default=True, help="Enable signal processing")
+    parser.add_argument("--n_pred", type=int, default=6, help="Number of prediction time steps")
 
     # Result logging
     parser.add_argument("--target_hor", type=int, default=0, help="Target prediction horizon")
@@ -100,12 +72,6 @@ def get_parameters():
     parser.add_argument("--print_every", type=int, default=50, help="Print frequency during training")
 
     args = parser.parse_args()
-
-    # Model-specific adjustments
-    if args.model != "CTSGNet":
-        args.enable_signal = False
-    args.dataset = "data/DATA" if args.enable_signal else "data/DATA_noSignal"
-    args.adj_data = "data/adjacency.pkl"
 
     print(f"Training configuration: {args}")
     set_env(args.seed)
@@ -126,20 +92,7 @@ def data_preparate(args, device):
     """Prepare graph structure and data loaders."""
     # Load adjacency matrix
     adj = util.load_adj(args.adj_data)
-
-    # Model-specific graph processing
-    if args.model in ["CTSGNet", "DCRNN", "MTGNN", "PGCN"]:
-        args.gso = torch.tensor(adj).to(device)
-    elif args.model == "STGCN":
-        gso = util.calc_gso(adj, args.gso_type, args.n_vertex)
-        if args.graph_conv_type == "cheb_graph_conv":
-            gso = util.calc_chebynet_gso(gso)
-        args.gso = torch.from_numpy(gso.toarray().astype(np.float32)).to(device)
-    elif args.model == "GWNT":
-        args.gso_type = "scalap"
-        adj = util.adjtype_specification(adj, args.gso_type)
-        args.gso = [torch.tensor(i).to(device) for i in adj]
-        # Uncomment if aptonly flag is needed: if args.aptonly: args.gso = None
+    args.gso = torch.tensor(adj).to(device)
 
     # Load dataset
     dataloader = util.load_dataset(args.dataset, args.batch_size, args.batch_size, args.batch_size)
@@ -148,62 +101,21 @@ def data_preparate(args, device):
 
 def prepare_model(args, device, tanhalpha, hop, gamma):
     """Initialize model, optimizer, and scheduler based on model type."""
-    if args.model == "STGCN":
-        Ko = args.n_his - (args.Kt - 1) * 2 * args.stblock_num
-        blocks = [[1]] + [[64, 16, 64] for _ in range(args.stblock_num)]
-        blocks.append([128] if Ko == 0 else [128, 128])
-        blocks.append([args.seq_out_len])
-        model_cls = STGCN.STGCNChebGraphConv if args.graph_conv_type == "cheb_graph_conv" else STGCN.STGCNGraphConv
-        model = model_cls(args, blocks, args.n_vertex)
-
-    elif args.model == "CTSGNet":
-        common_params = {
-            "seq_in": args.seq_in_len,
-            "gcn_depth": hop,
-            "num_nodes": args.n_vertex,
-            "device": device,
-            "cycle_num": 3,
-            "predefined_A": args.gso,
-            "dropout": args.droprate,
-            "seq_length": args.seq_in_len,
-            "out_dim": args.seq_out_len,
-            "tanhalpha": tanhalpha,
-            "gamma": gamma,
-        }
-
-        print("CTSGNet Model")
-        model = CTSGNet.gtnet_Signal(mlp_indim=args.seq_in_len + 4, **common_params)
-
-    elif args.model == "LSTM":
-        model = LSTM.VertexLSTM(1, 5, args.seq_out_len, 1, args.droprate)
-
-    elif args.model == "GWNT":
-        adjinit = None  # Replace with args.gso[0] if randomadj flag is needed
-        model = GWNT.gwnet(
-            device, args.n_vertex, args.droprate, args.gso, True, True, adjinit,
-            1, args.seq_out_len, 10, 10, 80, 160,
-        )
-
-    elif args.model == "DCRNN":
-        args.graph_conv_type = "laplacian"
-        model = DCRNN.DCRNNModel(
-            device, args.gso, cl_decay_steps=2000, filter_type=args.graph_conv_type,
-            horizon=args.seq_out_len, input_dim=1, l1_decay=0, max_diffusion_step=2,
-            num_nodes=args.n_vertex, num_rnn_layers=2, output_dim=1,
-            rnn_units=64, seq_len=args.seq_in_len, use_curriculum_learning=args.cl,
-        )
-
-    elif args.model == "MTGNN":
-        model = MTGNN.gtnet(
-            True, False, 1, args.n_vertex, device, args.gso, args.droprate, 40, 5, 1,
-            32, 32, 32, 128, args.seq_in_len, 1, args.seq_out_len, 1, 0.05, 3, True,
-        )
-
-    elif args.model == "PGCN":
-        model = PGCN.gwnet(
-            args.seq_in_len, args.batch_size, args.device, args.droprate, args.gso,
-            True, True, 1, args.seq_out_len, 12, 12, 96, 192,
-        )
+    common_params = {
+        "seq_in": args.seq_in_len,
+        "gcn_depth": hop,
+        "num_nodes": args.n_vertex,
+        "device": device,
+        "cycle_num": 3,
+        "predefined_A": args.gso,
+        "dropout": args.droprate,
+        "seq_length": args.seq_in_len,
+        "out_dim": args.seq_out_len,
+        "tanhalpha": tanhalpha,
+        "gamma": gamma,
+    }
+    print("CTSGNet Model")
+    model = CTSGNet.gtnet_Signal(mlp_indim=args.seq_in_len + 4, **common_params)
 
     model = model.to(device)
     n_params = sum(p.nelement() for p in model.parameters())
