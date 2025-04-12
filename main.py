@@ -267,7 +267,7 @@ def train(args, optimizer, scheduler, model, dataloader, device, w0=1, c1=0, c2=
         )
 
         # Save model checkpoint
-        path = f"_epoch_{args.model}_{epoch + 1}_{valid_avg['loss']:.4f}.pth"
+        path = f"_epoch_{args.model}_{epoch + 1}_{round(valid_avg['loss'], 4)}.pth"
         torch.save(model.state_dict(), args.save + path)
         print(f"Saved to {args.save + path}")
 
