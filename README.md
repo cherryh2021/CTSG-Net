@@ -145,3 +145,6 @@ Parameters:
 - `epochs=0`: Skips training and proceeds directly to testing.
 - `checkpoint_epoch=1`: Specifies the starting epoch for loading the checkpoint (any value greater than 0 is acceptable in testing).
 - `load_path='_epoch_CTSGNet_0.pth'`: Path to the trained model file in the garage/ directory.
+
+# Citation
+X. He, Q. Liu, K. Zhang, J. Shao and M. Li, "CTSG-Net: A Fine-Grained Intersection Queue Length Prediction Model at a Network Scale," in IEEE Transactions on Intelligent Transportation Systems, doi: 10.1109/TITS.2025.3605129.
